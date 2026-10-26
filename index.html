@@ -1,0 +1,355 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#126b50">
+<link rel="manifest" href="manifest.json">
+<title>Virtual OS Lab | SJF Simulator</title>
+<style>
+:root {
+  --green:#930b9d; --light:#e8f6ef; --bg:#f4f8f5;
+  --ink:#cf1b93; --muted:#ac1fc8; --line:#dce8e1;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0; font-family:Arial, sans-serif;
+  color:var(--ink); background:var(--bg);
+}
+header {
+  background:var(--green); color:white; padding:17px 22px;
+  display:flex; justify-content:space-between; gap:10px;
+}
+header small { display:block; margin-top:5px; color:#d4eee2; }
+.layout { display:grid; grid-template-columns:215px 1fr; min-height:90vh; }
+nav { background:white; padding:18px 12px; border-right:1px solid var(--line); }
+nav button {
+  display:block; width:100%; text-align:left; padding:13px;
+  margin-bottom:5px; border:0; border-radius:9px; background:white;
+  color:var(--ink); cursor:pointer; font-weight:bold;
+}
+nav button.active, nav button:hover { background:var(--light); color:var(--green); }
+main { padding:25px; min-width:0; }
+.page { display:none; } .page.active { display:block; }
+h1 { margin:8px 0; font-size:clamp(25px,4vw,34px); }
+h2 { font-size:19px; margin-top:0; }
+p { line-height:1.6; color:#52665d; }
+.eyebrow { color:var(--green); font-weight:bold; font-size:11px; letter-spacing:1.5px; }
+.card {
+  background:white; border:1px solid var(--line); border-radius:14px;
+  padding:18px; margin:15px 0; box-shadow:0 3px 12px #163d2910;
+}
+.stats { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:18px 0; }
+.stat { background:white; border:1px solid var(--line); border-radius:12px; padding:14px; }
+.stat small { color:var(--muted); display:block; margin-bottom:8px; }
+.stat strong { color:var(--green); font-size:22px; overflow-wrap:anywhere; }
+button.action {
+  border:1px solid var(--line); background:white; border-radius:8px;
+  padding:10px 13px; cursor:pointer; font-weight:bold; margin:4px 3px 4px 0;
+}
+button.primary { background:var(--green); color:white; border-color:var(--green); }
+button:disabled { opacity:.45; cursor:not-allowed; }
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; min-width:430px; }
+th,td { text-align:left; padding:10px; border-bottom:1px solid #edf2ee; }
+th { background:#f5faf7; color:var(--muted); font-size:12px; }
+input[type="text"], input[type="number"] {
+  width:100%; min-width:55px; padding:8px; border:1px solid #d9e5dd;
+  border-radius:6px;
+}
+.timeline { display:flex; gap:4px; overflow-x:auto; padding:10px 0; }
+.block {
+  flex:1; min-width:75px; padding:14px 8px; text-align:center;
+  background:#d9f1e3; border:1px solid #a9d9bd; border-radius:8px;
+}
+.block b { color:var(--green); display:block; }
+.block small { display:block; margin-top:8px; }
+.block.idle { background:#eef1ef; border-color:#d8dfda; }
+.status { padding:13px; background:#f4faf6; border-radius:9px; line-height:1.6; }
+.formula { padding:10px; margin:7px 0; background:var(--light); border-radius:7px; }
+label { display:block; margin:12px 0; }
+footer { text-align:center; padding:20px; color:var(--muted); font-size:12px; }
+@media(max-width:800px) {
+  .layout { grid-template-columns:1fr; }
+  nav { display:flex; gap:4px; overflow-x:auto; padding:8px; border-right:0; }
+  nav button { white-space:nowrap; width:auto; margin:0; }
+  main { padding:15px; }
+  .stats { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .stat strong { font-size:18px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div><b>⚙ VIRTUAL OS LAB</b><small>Operating Systems · CPU Scheduling Experiment</small></div>
+  <div class="header-actions">
+    <div>Non-Preemptive SJF</div>
+    <button class="exit-btn" onclick="exitLab()">✕ Exit</button>
+</div>
+</header>
+
+<div class="layout">
+<nav>
+  <button class="active" data-page="home">⌂ Overview</button>
+  <button data-page="theory">▤ Aim & Theory</button>
+  <button data-page="simulation">▶ Simulation</button>
+  <button data-page="results">▥ Results</button>
+  <button data-page="quiz">✓ Viva Quiz</button>
+</nav>
+
+<main>
+<section class="page active" id="home">
+  <div class="eyebrow">OPERATING SYSTEMS LABORATORY / EXPERIMENT</div>
+  <h1>Shortest Job First Scheduling</h1>
+  <p>Explore how a CPU chooses the shortest available process and calculate waiting time and turnaround time using an interactive experiment.</p>
+  <div class="stats">
+    <div class="stat"><small>Scheduling</small><strong style="font-size:17px">Non-preemptive</strong></div>
+    <div class="stat"><small>Input</small><strong>AT + BT</strong></div>
+    <div class="stat"><small>Visual output</small><strong style="font-size:17px">Gantt chart</strong></div>
+    <div class="stat"><small>Learning mode</small><strong style="font-size:17px">Interactive</strong></div>
+  </div>
+  <div class="card">
+    <h2>Experiment overview</h2>
+    <p>When the CPU becomes free, non-preemptive SJF selects the arrived process with the smallest burst time. Once selected, that process runs until it completes.</p>
+    <button class="action primary" onclick="page('simulation')">Start experiment →</button>
+    <button class="action" onclick="sample()">Load sample data</button>
+  </div>
+  <div class="card">
+    <h2>Learning objectives</h2>
+    <p>• Understand SJF scheduling.<br>• Observe process selection.<br>• Create a Gantt chart.<br>• Calculate CT, TAT, WT and averages.</p>
+  </div>
+</section>
+
+<section class="page" id="theory">
+  <div class="eyebrow">EXPERIMENT MANUAL</div><h1>Aim & Theory</h1>
+  <div class="card"><h2>Aim</h2><p>To simulate Non-Preemptive Shortest Job First CPU scheduling and calculate completion time, turnaround time and waiting time.</p></div>
+  <div class="card"><h2>Theory</h2><p>CPU scheduling selects a process from the ready queue. SJF chooses the process with the smallest burst time among processes that have already arrived. Non-preemptive means the selected process runs until completion. If no process has arrived, the CPU remains idle until the next arrival.</p></div>
+  <div class="card"><h2>Formulae</h2>
+    <div class="formula">CT = Completion Time</div>
+    <div class="formula">TAT = CT − AT</div>
+    <div class="formula">WT = TAT − BT</div>
+    <div class="formula">Average WT = Total WT ÷ Number of processes</div>
+    <div class="formula">Average TAT = Total TAT ÷ Number of processes</div>
+  </div>
+  <div class="card"><h2>Procedure</h2><p>1. Enter process arrival and burst times.<br>2. Find the arrived, unfinished processes.<br>3. Select the available process with the shortest burst time.<br>4. Run it until completion.<br>5. Repeat until all processes finish.<br>6. Calculate and analyse the results.</p></div>
+</section>
+
+<section class="page" id="simulation">
+  <div class="eyebrow">INTERACTIVE EXPERIMENT</div><h1>CPU Scheduling Simulator</h1>
+  <div class="card">
+    <h2>Process input table</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Process ID</th><th>Arrival time (AT)</th><th>Burst time (BT)</th><th>Action</th></tr></thead>
+      <tbody id="inputs"></tbody>
+    </table></div>
+    <button class="action" onclick="add()">＋ Add process</button>
+    <button class="action" onclick="sample()">Load sample</button>
+    <button class="action" onclick="clearInputs()">Clear all</button>
+    <button class="action primary" onclick="prepare()">Prepare simulation</button>
+    <p style="font-size:12px">Arrival time must be 0 or greater. Burst time must be at least 1. Process IDs must be unique.</p>
+  </div>
+  <div class="card">
+    <h2>CPU execution timeline</h2>
+    <div class="timeline" id="gantt">Prepare the simulation to display the Gantt chart.</div>
+    <div class="status" id="status">Add processes and select Prepare simulation.</div>
+    <p id="explain">Your scheduling explanation will appear here.</p>
+    <button class="action primary" id="start" onclick="start()" disabled>▶ Start</button>
+    <button class="action" id="step" onclick="step()" disabled>Step →</button>
+    <button class="action" id="pause" onclick="pause()" disabled>Ⅱ Pause</button>
+    <button class="action" onclick="reset()">↺ Reset</button>
+  </div>
+</section>
+
+<section class="page" id="results">
+  <div class="eyebrow">EXPERIMENT OUTPUT</div><h1>Results & Observations</h1>
+  <div class="stats">
+    <div class="stat"><small>Completed processes</small><strong id="count">0</strong></div>
+    <div class="stat"><small>Average WT</small><strong id="avgwt">—</strong></div>
+    <div class="stat"><small>Average TAT</small><strong id="avgtat">—</strong></div>
+    <div class="stat"><small>Elapsed time</small><strong id="elapsed">—</strong></div>
+  </div>
+  <div class="card"><h2>Process timing table</h2><div class="table-wrap"><table>
+    <thead><tr><th>PID</th><th>AT</th><th>BT</th><th>Start</th><th>CT</th><th>TAT</th><th>WT</th></tr></thead>
+    <tbody id="resultsTable"><tr><td colspan="7">Complete the simulation to see results.</td></tr></tbody>
+  </table></div></div>
+  <div class="card"><h2>Conclusion</h2><p id="conclusion">Complete the experiment to generate the conclusion.</p></div>
+</section>
+
+<section class="page" id="quiz">
+  <div class="eyebrow">CHECK YOUR UNDERSTANDING</div><h1>Viva Quiz</h1>
+  <div class="card">
+    <form id="quizForm">
+      <b>1. What does SJF stand for?</b>
+      <label><input type="radio" name="q1" value="a"> Shortest Job First</label>
+      <label><input type="radio" name="q1" value="b"> Scheduled Job Format</label>
+      <hr>
+      <b>2. In non-preemptive SJF, the running process:</b>
+      <label><input type="radio" name="q2" value="a"> Is interrupted whenever a shorter process arrives</label>
+      <label><input type="radio" name="q2" value="b"> Runs until completion</label>
+      <hr>
+      <b>3. Turnaround time equals:</b>
+      <label><input type="radio" name="q3" value="a"> CT − AT</label>
+      <label><input type="radio" name="q3" value="b"> TAT − BT</label>
+      <hr>
+      <b>4. Waiting time equals:</b>
+      <label><input type="radio" name="q4" value="a"> TAT − BT</label>
+      <label><input type="radio" name="q4" value="b"> CT + AT</label>
+      <button class="action primary" type="submit">Check answers</button>
+      <button class="action" type="reset" onclick="document.getElementById('quizScore').textContent=''">Try again</button>
+      <p id="quizScore"></p>
+    </form>
+  </div>
+</section>
+<footer>Virtual OS Lab · Educational simulator · Non-Preemptive SJF</footer>
+</main>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let pidNumber = 1, events = [], position = 0, timer = null, finished = false;
+
+function page(name) {
+  document.querySelectorAll('.page').forEach(s => s.classList.toggle('active', s.id === name));
+  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('active', b.dataset.page === name));
+}
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => page(b.dataset.page));
+
+function add(pid = 'P' + pidNumber++, at = 0, bt = 1) {
+  const tr = document.createElement('tr');
+  const id = document.createElement('input'); id.type='text'; id.value=pid; id.maxLength=12;
+  const arrival = document.createElement('input'); arrival.type='number'; arrival.min='0'; arrival.step='1'; arrival.value=at;
+  const burst = document.createElement('input'); burst.type='number'; burst.min='1'; burst.step='1'; burst.value=bt;
+  const cell = document.createElement('td'); const remove = document.createElement('button');
+  remove.className='action'; remove.textContent='Remove'; remove.onclick=()=>{tr.remove();invalidate();};
+  [id,arrival,burst].forEach(inp=>{const td=document.createElement('td');td.appendChild(inp);tr.appendChild(td);inp.oninput=invalidate;});
+  cell.appendChild(remove);tr.appendChild(cell);$('inputs').appendChild(tr);invalidate();
+}
+function clearInputs() { stop(); $('inputs').innerHTML=''; pidNumber=1; invalidate(); $('status').textContent='No processes. Add at least one process.'; }
+function sample() { stop(); $('inputs').innerHTML=''; pidNumber=5; add('P1',0,7); add('P2',2,4); add('P3',4,1); add('P4',5,4); prepare(); }
+function invalidate() {
+  stop(); events=[]; position=0; finished=false;
+  $('gantt').textContent='Prepare the simulation to display the Gantt chart.';
+  $('status').textContent='Inputs changed. Select Prepare simulation.';
+  $('explain').textContent='Prepare the simulation to see the scheduling explanation.';
+  $('start').disabled=$('step').disabled=true;
+  $('pause').disabled=true;
+  $('resultsTable').innerHTML='<tr><td colspan="7">Complete the simulation to see results.</td></tr>';
+  ['avgwt','avgtat','elapsed'].forEach(id=>$(id).textContent='—');
+  $('count').textContent='0'; $('conclusion').textContent='Complete the experiment to generate the conclusion.';
+}
+function readInputs() {
+  const rows=[...$('inputs').querySelectorAll('tr')];
+  if(!rows.length) throw Error('Add at least one process.');
+  const list=rows.map((r,i)=>{
+    const v=r.querySelectorAll('input'), pid=v[0].value.trim(), at=Number(v[1].value), bt=Number(v[2].value);
+    if(!pid) throw Error('Every process needs an ID.');
+    if(v[1].value===''||!Number.isInteger(at)||at<0) throw Error('Arrival time must be a whole number ≥ 0.');
+    if(v[2].value===''||!Number.isInteger(bt)||bt<1) throw Error('Burst time must be a whole number ≥ 1.');
+    return {pid,at,bt,order:i};
+  });
+  if(new Set(list.map(p=>p.pid.toLowerCase())).size!==list.length) throw Error('Process IDs must be unique.');
+  return list;
+}
+function makeSchedule(list) {
+  const pending=list.map(p=>({...p,done:false})), out=[]; let t=0, n=0;
+  while(n<pending.length) {
+    const ready=pending.filter(p=>!p.done&&p.at<=t);
+    if(!ready.length) {
+      const next=Math.min(...pending.filter(p=>!p.done).map(p=>p.at));
+      out.push({kind:'idle',start:t,end:next}); t=next; continue;
+    }
+    ready.sort((a,b)=>a.bt-b.bt||a.at-b.at||a.order-b.order);
+    const p=ready[0], start=t, ct=t+p.bt;
+    p.done=true; n++;
+    out.push({kind:'process',pid:p.pid,at:p.at,bt:p.bt,start,end:ct,ct,tat:ct-p.at,wt:ct-p.at-p.bt});
+    t=ct;
+  }
+  return out;
+}
+function prepare() {
+  try {
+    stop(); events=makeSchedule(readInputs()); position=0; finished=false;
+    $('start').disabled=$('step').disabled=false; $('pause').disabled=true;
+    $('gantt').textContent='Ready. Press Start or Step.';
+    $('status').textContent='Simulation prepared. Start the animation or advance one event at a time.';
+    $('explain').textContent='The CPU is ready. Step through the timeline to see each decision.';
+    renderResults(false);
+  } catch(e) { $('status').textContent=e.message; }
+}
+function draw() {
+  const shown=events.slice(0,position); $('gantt').innerHTML='';
+  if(!shown.length) { $('gantt').textContent='Press Start or Step to begin.'; return; }
+  shown.forEach(e=>{
+    const b=document.createElement('div'); b.className='block'+(e.kind==='idle'?' idle':'');
+    b.style.flex=Math.max(1,e.end-e.start);
+    const title=document.createElement('b'); title.textContent=e.kind==='idle'?'CPU Idle':e.pid;
+    const time=document.createElement('small'); time.textContent=e.start+' → '+e.end;
+    b.append(title,time); $('gantt').appendChild(b);
+  });
+}
+function step() {
+  if(!events.length||finished)return;
+  position++; draw();
+  const e=events[position-1];
+  if(e.kind==='idle') {
+    $('status').textContent=`CPU idle from time ${e.start} to ${e.end}.`;
+    $('explain').textContent=`No unfinished process had arrived at time ${e.start}. The CPU waits until time ${e.end}.`;
+  } else {
+    $('status').textContent=`${e.pid} runs from ${e.start} to ${e.end}.`;
+    $('explain').textContent=`At time ${e.start}, the CPU selects ${e.pid}, with burst time ${e.bt}. It runs until time ${e.end}. CT = ${e.ct}, TAT = ${e.tat}, WT = ${e.wt}.`;
+  }
+  if(position===events.length) {
+    finished=true; stop(); $('status').textContent='Simulation complete. Open Results to view the final table.';
+    $('start').disabled=$('step').disabled=true; renderResults(true);
+  }
+}
+function start() {
+  if(timer||finished||!events.length)return;
+  $('start').disabled=$('step').disabled=true; $('pause').disabled=false;
+  timer=setInterval(()=>{if(position<events.length)step();else stop();},1000);
+}
+function stop() {
+  if(timer){clearInterval(timer);timer=null;}
+  if($('pause'))$('pause').disabled=true;
+  if($('start')&&events.length&&!finished)$('start').disabled=false;
+  if($('step')&&events.length&&!finished)$('step').disabled=false;
+}
+function pause() { stop(); $('status').textContent='Paused. Press Start to continue or Step to advance once.'; }
+function reset() {
+  stop(); position=0; finished=false; draw();
+  $('status').textContent='Simulation reset. Press Start or Step to begin.';
+  $('explain').textContent='The CPU is ready to begin the prepared schedule.';
+  $('start').disabled=!events.length; $('step').disabled=!events.length;
+  renderResults(false);
+}
+function renderResults(done) {
+  const rows=events.filter(e=>e.kind==='process');
+  $('count').textContent=done?rows.length:0;
+  if(!done){$('resultsTable').innerHTML='<tr><td colspan="7">Complete the simulation to see results.</td></tr>';return;}
+  $('resultsTable').innerHTML='';
+  rows.forEach(p=>{
+    const tr=document.createElement('tr');
+    [p.pid,p.at,p.bt,p.start,p.ct,p.tat,p.wt].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td);});
+    $('resultsTable').appendChild(tr);
+  });
+  const avgWT=rows.reduce((s,p)=>s+p.wt,0)/rows.length;
+  const avgTAT=rows.reduce((s,p)=>s+p.tat,0)/rows.length;
+  $('avgwt').textContent=avgWT.toFixed(2); $('avgtat').textContent=avgTAT.toFixed(2);
+  $('elapsed').textContent=events[events.length-1].end;
+  $('conclusion').textContent=`${rows.length} processes completed. Average waiting time = ${avgWT.toFixed(2)} and average turnaround time = ${avgTAT.toFixed(2)} time units. SJF selected the shortest burst among processes that had already arrived at each scheduling decision.`;
+}
+$('quizForm').onsubmit=e=>{
+  e.preventDefault(); const key={q1:'a',q2:'b',q3:'a',q4:'a'}; let score=0;
+  Object.entries(key).forEach(([q,a])=>{if(document.querySelector(`input[name="${q}"]:checked`)?.value===a)score++;});
+  $('quizScore').textContent=`Your score: ${score}/4`;
+};
+add('P1',0,7); add('P2',2,4); add('P3',4,1); add('P4',5,4);
+invalidate();
+
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>

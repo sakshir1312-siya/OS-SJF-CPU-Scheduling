@@ -1,0 +1,19 @@
+
+{
+  "name": "Virtual OS Lab - SJF Simulator",
+  "short_name": "SJF OS Lab",
+  "description": "Interactive Non-Preemptive SJF CPU Scheduling Lab",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f8f5",
+  "theme_color": "#126b50",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

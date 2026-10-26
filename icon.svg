@@ -1,0 +1,12 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="26" fill="#126b50"/>
+  <circle cx="64" cy="64" r="40"
+          fill="none" stroke="white" stroke-width="7"/>
+  <path d="M64 25 L77 46 L51 46 Z" fill="white"/>
+  <path d="M98 78 L75 80 L88 58 Z" fill="white"/>
+  <path d="M30 78 L43 58 L53 80 Z" fill="white"/>
+  <text x="64" y="73" font-family="Arial"
+        font-size="24" font-weight="bold"
+        text-anchor="middle" fill="white">OS</text>
+</svg>
